@@ -74,7 +74,8 @@ def _get_display_width(text: str) -> int:
 
 def _autofit_columns(worksheet: Worksheet, max_width: int = 50) -> None:
     """
-    Set each column's width to fit its longest line of text
+    Set each column's width to fit its longest line of text, and wrap text in cells
+    that are wider than the maximum width so they are not clipped
 
     Args:
         worksheet: openpyxl worksheet to adjust
@@ -86,6 +87,8 @@ def _autofit_columns(worksheet: Worksheet, max_width: int = 50) -> None:
             if cell.value is None:
                 continue
             text_width = max(_get_display_width(line) for line in str(cell.value).split("\n"))
+            if text_width > max_width:
+                cell.alignment = Alignment(wrap_text=True)
             column_widths[cell.column] = max(column_widths.get(cell.column, 0), text_width)
 
     for column_index, text_width in column_widths.items():
